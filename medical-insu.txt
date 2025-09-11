@@ -1,0 +1,87 @@
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt 
+import seaborn as sns 
+from sklearn.model_selection import train_test_split 
+from sklearn.ensemble import RandomForestRegressor 
+insurance_data = pd.read_csv('Medicalpremium.csv') 
+insurance_data.head() 
+insurance_data.info() 
+insurance_data.describe() 
+insurance_data.shape 
+insurance_data.isnull().sum() 
+sns.set() 
+plt.figure(figsize=(11,11)) 
+sns.displot(insurance_data['Age']) 
+plt.show() 
+insurance_data['Age'].value_counts() 
+sns.set() 
+plt.figure(figsize=(11,11)) 
+sns.displot(insurance_data['Diabetes']) 
+plt.show() 
+insurance_data 
+input_data = insurance_data.drop(columns='PremiumPrice') 
+output_data = insurance_data['PremiumPrice'] 
+input_data 
+output_data 
+10 
+input_train_data, input_test_data, output_train_data, output_test_data = 
+train_test_split(input_data, output_data, test_size=0.2) 
+print(input_data.shape, input_train_data.shape, input_test_data.shape) 
+print(output_data.shape, output_train_data.shape, output_test_data.shape) 
+model = RandomForestRegressor(n_estimators=100, max_depth=12) 
+model.fit(input_train_data, output_train_data) 
+test_data_predictions = model.predict(input_test_data) 
+from sklearn.metrics import r2_score 
+r2_score(test_data_predictions,output_test_data) 
+input_data = (45, 0,0,0, 0, 155,57,0,0,0) 
+input_data_array = np.asarray(input_data) 
+input_data_array = input_data_array.reshape(1,-1) 
+insurance_premium = model.predict(input_data_array) 
+insurance_premium[0] 
+import pickle as pkl 
+pkl.dump(model, open('MIPML.pkl','wb')) 
+import numpy as np 
+import pandas as pd 
+import pickle as pkl  
+import streamlit as st 
+model = pkl.load(open('MIPML.pkl', 'rb')) 
+st.header('Medical Insurance Premium Predictor') 
+11 
+12 
+ 
+Age = st.slider('Enter Age', 5 , 80) 
+Diabetes = st.selectbox('If any Diabetes', ['Yes', 'No']) 
+BloodPressureProblems = st.selectbox('BP Problems', ['Yes', 'No']) 
+AnyTransplants = st.selectbox('Any Transplants', ['Yes', 'No']) 
+AnyChronicDiseases = st.selectbox('Any Chronic Diseases', ['Yes', 'No']) 
+Height = st.slider('Enter Height (cm)', 0 , 200) 
+Weight = st.slider('Enter Weight (kg)', 0, 150) 
+KnownAllergies = st.selectbox('Known Allergies', ['Yes', 'No']) 
+HistoryOfCancerInFamily = st.selectbox('History Of Cancer In Family', 
+['Yes', 'No']) 
+NumberOfMajorSurgeries = st.slider('Number of Major Surgeries', 0, 3) 
+ 
+ 
+if st.button('Predict'): 
+     
+    Diabetes = 0 if Diabetes == 'Yes' else 1 
+    BloodPressureProblems = 0 if BloodPressureProblems == 'Yes' else 1 
+    AnyTransplants = 0 if AnyTransplants == 'Yes' else 1 
+    AnyChronicDiseases = 0 if AnyChronicDiseases == 'Yes' else 1 
+    KnownAllergies = 0 if KnownAllergies == 'Yes' else 1 
+    HistoryOfCancerInFamily = 0 if HistoryOfCancerInFamily == 'Yes' else 
+1 
+ 
+     
+    input_data = (Age, Diabetes, BloodPressureProblems, AnyTransplants, 
+                  AnyChronicDiseases, Height, Weight, KnownAllergies, 
+                  HistoryOfCancerInFamily, NumberOfMajorSurgeries) 
+     
+    input_data_array = np.asarray(input_data).reshape(1, -1) 
+ 
+     
+    predicted_prem = model.predict(input_data_array) 
+    display_string = 'Insurance Premium will be ' + 
+str(round(predicted_prem[0], 2)) + ' Indian Rupees' 
+    st.markdown(display_string)
