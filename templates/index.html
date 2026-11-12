@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medical Insurance Premium Predictor</title>
+  <style>
+    :root {
+      --primary: #5b5ce2;
+      --primary-dark: #4142b7;
+      --accent: #f66335;
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #20243a;
+      --muted: #69708a;
+      --border: #e1e5f0;
+      --success-bg: #eaf8f0;
+      --success: #176b3a;
+      --error-bg: #fff0ef;
+      --error: #a12d25;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(91,92,226,.13), transparent 30rem),
+        radial-gradient(circle at 100% 15%, rgba(246,99,53,.10), transparent 28rem),
+        var(--bg);
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 22px max(5vw, 20px);
+      border-bottom: 1px solid rgba(225,229,240,.8);
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      display: grid; place-items: center;
+      width: 44px; height: 44px; border-radius: 14px;
+      color: white; font-size: 23px; font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), #8585ff);
+      box-shadow: 0 8px 20px rgba(91,92,226,.24);
+    }
+    .brand-name { font-size: 16px; font-weight: 800; letter-spacing: -.3px; }
+    .brand-caption { margin-top: 3px; font-size: 12px; color: var(--muted); }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border: 1px solid var(--border);
+      border-radius: 999px; color: var(--muted); font-size: 12px;
+      background: white;
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #20a464; }
+    main { width: min(1080px, calc(100% - 36px)); margin: 44px auto 60px; }
+    .hero { text-align: center; max-width: 720px; margin: 0 auto 30px; }
+    .eyebrow {
+      display: inline-block; margin-bottom: 12px; padding: 7px 11px;
+      border-radius: 999px; background: #eeeeff; color: var(--primary-dark);
+      font-size: 11px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+    }
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 46px); letter-spacing: -1.7px; line-height: 1.12; }
+    .hero p { margin: 14px auto 0; color: var(--muted); font-size: 15px; line-height: 1.7; max-width: 610px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, .8fr); gap: 22px; align-items: start; }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 22px; box-shadow: 0 16px 50px rgba(34,42,80,.06);
+      overflow: hidden;
+    }
+    .card-head { padding: 24px 26px 20px; border-bottom: 1px solid var(--border); }
+    .card-head h2 { margin: 0; font-size: 18px; letter-spacing: -.4px; }
+    .card-head p { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    form { padding: 24px 26px 26px; }
+    .section-label {
+      margin: 0 0 15px; color: var(--primary-dark); font-size: 11px;
+      font-weight: 800; letter-spacing: 1.1px; text-transform: uppercase;
+    }
+    .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 19px 16px; }
+    .field { min-width: 0; }
+    label, .field-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; font-size: 13px; font-weight: 700; }
+    .hint { color: var(--muted); font-size: 11px; font-weight: 500; }
+    select, input[type="number"] {
+      width: 100%; height: 46px; padding: 0 13px;
+      border: 1px solid var(--border); border-radius: 10px;
+      outline: none; background: #fbfcff; color: var(--text);
+      font: inherit; font-size: 13px; transition: border-color .18s, box-shadow .18s;
+    }
+    select:focus, input[type="number"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(91,92,226,.12); }
+    .range-wrap { padding-top: 2px; }
+    .range-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    output { color: var(--primary-dark); font-weight: 800; font-size: 13px; }
+    input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
+    .range-limits { display: flex; justify-content: space-between; margin-top: 4px; color: #9298ad; font-size: 10px; }
+    .form-divider { border: 0; border-top: 1px solid var(--border); margin: 25px 0 22px; }
+    .actions { display: flex; align-items: center; gap: 14px; margin-top: 25px; }
+    .primary-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      min-height: 49px; padding: 0 22px; border: 0; border-radius: 11px;
+      color: white; background: linear-gradient(135deg, var(--primary), #7778f5);
+      font-size: 14px; font-weight: 800; cursor: pointer;
+      box-shadow: 0 8px 18px rgba(91,92,226,.23); transition: transform .18s, box-shadow .18s;
+    }
+    .primary-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 22px rgba(91,92,226,.3); }
+    .primary-btn:disabled { opacity: .65; cursor: wait; transform: none; }
+    .reset-btn { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; }
+    .reset-btn:hover { color: var(--primary-dark); }
+    .side-card { padding: 25px; }
+    .side-icon {
+      display: grid; place-items: center; width: 48px; height: 48px;
+      margin-bottom: 18px; border-radius: 15px; color: var(--primary-dark);
+      background: #eeeeff; font-size: 24px;
+    }
+    .side-card h3 { margin: 0; font-size: 17px; letter-spacing: -.4px; }
+    .side-card > p { margin: 9px 0 21px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .steps { display: grid; gap: 17px; }
+    .step { display: flex; gap: 12px; align-items: flex-start; }
+    .step-number {
+      flex: 0 0 28px; display: grid; place-items: center; width: 28px; height: 28px;
+      border-radius: 9px; background: #f0f1ff; color: var(--primary-dark);
+      font-size: 12px; font-weight: 800;
+    }
+    .step strong { display: block; margin: 1px 0 4px; font-size: 12px; }
+    .step span { display: block; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .privacy-note { display: flex; gap: 10px; margin-top: 23px; padding: 13px; border-radius: 12px; background: #f7f8fc; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .result { display: none; margin-top: 22px; border-radius: 16px; padding: 20px; }
+    .result.success { display: block; background: var(--success-bg); border: 1px solid #c8ecd6; color: var(--success); }
+    .result.error { display: block; background: var(--error-bg); border: 1px solid #f4d1cd; color: var(--error); }
+    .result h3 { margin: 0 0 7px; font-size: 14px; }
+    .result p { margin: 0; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+    .premium-amount { margin-top: 7px; font-size: clamp(24px, 4vw, 34px); font-weight: 850; letter-spacing: -1px; }
+    footer { padding: 0 18px 28px; color: #8b91a5; text-align: center; font-size: 11px; line-height: 1.6; }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      .side-card { order: 2; }
+      main { margin-top: 32px; }
+    }
+    @media (max-width: 520px) {
+      .topbar { padding: 16px 18px; }
+      .status-pill { display: none; }
+      main { width: min(100% - 22px, 1080px); margin-top: 28px; }
+      .hero p { font-size: 13px; }
+      .card-head { padding: 21px 19px 17px; }
+      form { padding: 21px 19px; }
+      .fields { grid-template-columns: 1fr; gap: 17px; }
+      .actions { align-items: stretch; flex-direction: column; }
+      .primary-btn { width: 100%; }
+      .reset-btn { min-height: 35px; }
+      .side-card { padding: 21px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">+</div>
+      <div>
+        <div class="brand-name">CarePredict</div>
+        <div class="brand-caption">Medical insurance estimator</div>
+      </div>
+    </div>
+    <div class="status-pill"><span class="status-dot"></span> Prediction form ready</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <span class="eyebrow">Smart insurance estimation</span>
+      <h1>Medical Insurance<br>Premium Predictor</h1>
+      <p>Enter the requested details to estimate a medical insurance premium using your trained machine learning model.</p>
+    </section>
+
+    <div class="layout">
+      <section class="card">
+        <div class="card-head">
+          <h2>Your information</h2>
+          <p>Complete the fields below, then select Predict Premium.</p>
+        </div>
+        <form id="premium-form">
+          <p class="section-label">Personal details</p>
+          <div class="fields">
+            <div class="field range-wrap">
+              <div class="range-top"><label for="age">Age</label><output id="age-value" for="age">30 years</output></div>
+              <input id="age" name="Age" type="range" min="5" max="80" value="30" />
+              <div class="range-limits"><span>5 years</span><span>80 years</span></div>
+            </div>
+            <div class="field range-wrap">
+              <div class="range-top"><label for="height">Height</label><output id="height-value" for="height">170 cm</output></div>
+              <input id="height" name="Height" type="range" min="0" max="200" value="170" />
+              <div class="range-limits"><span>0 cm</span><span>200 cm</span></div>
+            </div>
+            <div class="field range-wrap">
+              <div class="range-top"><label for="weight">Weight</label><output id="weight-value" for="weight">70 kg</output></div>
+              <input id="weight" name="Weight" type="range" min="0" max="150" value="70" />
+              <div class="range-limits"><span>0 kg</span><span>150 kg</span></div>
+            </div>
+            <div class="field range-wrap">
+              <div class="range-top"><label for="surgeries">Major surgeries</label><output id="surgeries-value" for="surgeries">0</output></div>
+              <input id="surgeries" name="NumberOfMajorSurgeries" type="range" min="0" max="3" value="0" step="1" />
+              <div class="range-limits"><span>0</span><span>3</span></div>
+            </div>
+          </div>
+
+          <hr class="form-divider" />
+          <p class="section-label">Medical history</p>
+          <div class="fields">
+            <div class="field">
+              <label for="diabetes">Diabetes</label>
+              <select id="diabetes" name="Diabetes"><option value="No">No</option><option value="Yes">Yes</option></select>
+            </div>
+            <div class="field">
+              <label for="bp">Blood pressure problems</label>
+              <select id="bp" name="BloodPressureProblems"><option value="No">No</option><option value="Yes">Yes</option></select>
+            </div>
+            <div class="field">
+              <label for="transplants">Any transplants</label>
+              <select id="transplants" name="AnyTransplants"><option value="No">No</option><option value="Yes">Yes</option></select>
+            </div>
+            <div class="field">
+              <label for="chronic">Chronic diseases</label>
+              <select id="chronic" name="AnyChronicDiseases"><option value="No">No</option><option value="Yes">Yes</option></select>
+            </div>
+            <div class="field">
+              <label for="allergies">Known allergies</label>
+              <select id="allergies" name="KnownAllergies"><option value="No">No</option><option value="Yes">Yes</option></select>
+            </div>
+            <div class="field">
+              <label for="cancer">Family history of cancer</label>
+              <select id="cancer" name="HistoryOfCancerInFamily"><option value="No">No</option><option value="Yes">Yes</option></select>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="primary-btn" id="predict-btn" type="submit"><span aria-hidden="true">✦</span> Predict Premium</button>
+            <button class="reset-btn" type="reset">Reset form</button>
+          </div>
+          <div id="result" class="result" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+
+      <aside class="card side-card">
+        <div class="side-icon" aria-hidden="true">⌁</div>
+        <h3>How it works</h3>
+        <p>Your details are submitted to the prediction service, which uses the trained model to estimate a premium.</p>
+        <div class="steps">
+          <div class="step"><div class="step-number">1</div><div><strong>Enter your details</strong><span>Provide age, body measurements, and medical history.</span></div></div>
+          <div class="step"><div class="step-number">2</div><div><strong>Run the model</strong><span>The backend processes your inputs in the order expected by the model.</span></div></div>
+          <div class="step"><div class="step-number">3</div><div><strong>View the estimate</strong><span>Your estimated premium appears below the form.</span></div></div>
+        </div>
+        <div class="privacy-note"><span aria-hidden="true">ⓘ</span><span>This is an educational estimator, not a binding insurance quote or medical advice. Actual premiums may differ.</span></div>
+      </aside>
+    </div>
+  </main>
+  <footer>Medical Insurance Premium Predictor · Machine-learning project</footer>
+
+  <script>
+    // Keep these ranges and field names aligned with the original Streamlit app.
+    const form = document.getElementById('premium-form');
+    const result = document.getElementById('result');
+    const predictBtn = document.getElementById('predict-btn');
+
+    const rangeConfig = [
+      ['age', 'age-value', ' years'],
+      ['height', 'height-value', ' cm'],
+      ['weight', 'weight-value', ' kg'],
+      ['surgeries', 'surgeries-value', '']
+    ];
+
+    function updateRangeLabels() {
+      rangeConfig.forEach(([inputId, outputId, suffix]) => {
+        const input = document.getElementById(inputId);
+        document.getElementById(outputId).textContent = input.value + suffix;
+      });
+    }
+    rangeConfig.forEach(([inputId]) => {
+      document.getElementById(inputId).addEventListener('input', updateRangeLabels);
+    });
+    updateRangeLabels();
+
+    function getPayload() {
+      const data = new FormData(form);
+      return {
+        Age: Number(data.get('Age')),
+        Diabetes: data.get('Diabetes'),
+        BloodPressureProblems: data.get('BloodPressureProblems'),
+        AnyTransplants: data.get('AnyTransplants'),
+        AnyChronicDiseases: data.get('AnyChronicDiseases'),
+        Height: Number(data.get('Height')),
+        Weight: Number(data.get('Weight')),
+        KnownAllergies: data.get('KnownAllergies'),
+        HistoryOfCancerInFamily: data.get('HistoryOfCancerInFamily'),
+        NumberOfMajorSurgeries: Number(data.get('NumberOfMajorSurgeries'))
+      };
+    }
+
+    function showError(message) {
+      result.className = 'result error';
+      result.innerHTML = '<h3>Unable to get prediction</h3><p></p>';
+      result.querySelector('p').textContent = message;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      result.className = 'result';
+      result.style.display = 'none';
+      predictBtn.disabled = true;
+      predictBtn.textContent = 'Predicting…';
+
+      try {
+        // Expected backend: POST /predict with JSON input and JSON response.
+        // Example response: { "premium": 12345.67 }
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(getPayload())
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || 'The prediction server returned an error. Check that your Python backend is running.');
+        }
+
+        const premium = data.premium ?? data.predicted_premium ?? data.prediction;
+        if (premium === undefined || !Number.isFinite(Number(premium))) {
+          throw new Error('The server response did not include a numeric premium. Expected JSON such as {"premium": 12345.67}.');
+        }
+
+        result.className = 'result success';
+        result.innerHTML = '<h3>Estimated insurance premium</h3><div class="premium-amount"></div><p>Indian Rupees (₹) · Model estimate only</p>';
+        result.querySelector('.premium-amount').textContent = Number(premium).toLocaleString('en-IN', {
+          style: 'currency', currency: 'INR', maximumFractionDigits: 2
+        });
+        result.style.display = 'block';
+      } catch (error) {
+        showError(error.message || 'Could not connect to the prediction server.');
+        result.style.display = 'block';
+      } finally {
+        predictBtn.disabled = false;
+        predictBtn.innerHTML = '<span aria-hidden="true">✦</span> Predict Premium';
+      }
+    });
+
+    form.addEventListener('reset', () => {
+      setTimeout(() => {
+        updateRangeLabels();
+        result.className = 'result';
+        result.style.display = 'none';
+        result.textContent = '';
+      }, 0);
+    });
+  </script>
+</body>
+</html>
