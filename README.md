@@ -1,19 +1,25 @@
-# Medical Insurance Cost Prediction  Using Random Forest Regression
+# Medical Insurance Cost Prediction Using Random Forest Regression
 
 ## About the Project
-Medical Insurance Cost Prediction is a Machine Learning project that predicts the medical insurance cost based on a person's details.
 
-The user enters their personal and health-related information, and the trained machine learning model predicts the insurance cost in Indian Rupees.
+Medical Insurance Cost Prediction is a Machine Learning project that predicts the medical insurance cost based on a person's personal and health-related details.
+
+The application uses a trained Random Forest Regression model to estimate the insurance cost in Indian Rupees (₹).
+
+Users can enter their details through a simple Streamlit web interface and get the predicted insurance cost.
 
 ## Technologies Used
+
 - Python
 - Machine Learning
+- Random Forest Regression
 - NumPy
 - Pandas
 - Streamlit
 - Pickle
 
-## Input Details
+## Input Features
+
 The application takes the following inputs:
 
 1. Age
@@ -27,35 +33,53 @@ The application takes the following inputs:
 9. Family History of Cancer
 10. Number of Major Surgeries
 
-## Project Files
+## Project Structure
 
-- `app.py` – Main Python application.
-- `MIPML.pkl` – Trained Machine Learning model.
-- `requirements.txt` – Required Python libraries.
-- `README.md` – Project description and instructions.
+Medical_Insurance_Prediction/
+│
+├── app.py
+├── MIPML.pkl
+├── requirements.txt
+└── README.md
 
-## How to Run the Project
+## Installation and Setup
 
-**Step 1:** Install Python on your computer.
+**Step 1: Install Python**
 
-**Step 2:** Open the project folder in VS Code or PyCharm.
+Install Python on your computer.
 
-**Step 3:** Install the required libraries.
+**Step 2: Clone the Repository**
+
+git clone https://github.com/dileepkumarpallelapati/Medical-Insurance-Cost-Prediction-Using-Random-Forest-Regression/edit/main/README.md
+
+**Step 3: Open the Project Folder**
+
+cd Medical_Insurance_Prediction
+
+**Step 4: Install Required Libraries**
 
 pip install -r requirements.txt
 
-**Step 4:** Run the application.
+**Step 5: Run the Application**
 
 streamlit run app.py
 
-**Step 5:** Open the local URL displayed in your terminal.
+**Step 6: Open the Application**
 
-**Step 6:** Enter the required details and click the **Predict** button.
+Open the local URL displayed in your terminal.
 
-**Step 7:** The predicted medical insurance cost will be displayed on the screen.
+**Step 7: Get Prediction**
+
+Enter the required details and click the **Predict** button to view the estimated medical insurance cost.
 
 ## Output
-The application displays the predicted medical insurance cost in Indian Rupees based on the entered details.
+
+The application displays the predicted medical insurance cost in Indian Rupees (₹) based on the entered details.
 
 ## Conclusion
-This project helps users estimate their medical insurance cost using Machine Learning. It provides a simple interface where users can enter their details and get a prediction.
+
+This project demonstrates how Machine Learning can be used to estimate medical insurance costs based on personal and health-related information.
+
+It provides a simple and user-friendly interface using Streamlit.
+
+**Note:** The predicted insurance cost is an estimate and should not be considered an actual insurance quotation.
